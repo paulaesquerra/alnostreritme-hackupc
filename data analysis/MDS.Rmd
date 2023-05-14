@@ -1,0 +1,91 @@
+---
+title: "AlNostreRitme"
+output: html_document
+date: "2023-05-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We apply Multidimensional Scaling to the data that we have about the products (excluding sales and inventory), to identify products that are similar and that we could therefore group together.
+
+## MDS
+
+```{r cars}
+data = read.csv2("characteristics.csv", sep=",")
+head(data)
+```
+
+We convert the variables to the right type.
+```{r}
+#df = subset(train_data, select=c("id", "sales_units", "inventory_units"))
+data$product_number <- as.character(data$product_number)
+data$reporterhq_id <- as.factor(data$reporterhq_id)
+data$prod_category <- as.factor(data$prod_category)
+data$display_size <- as.double(data$display_size)
+data$segment <- as.factor(data$segment)
+data$avg_sales <- as.double(data$avg_sales)
+data$avg_inventory <- as.double(data$avg_inventory)
+head(data)
+```
+
+To apply MDS we need a distance matrix.
+```{r}
+library(cluster)
+dist_data = daisy(data[,-c(1)],metric = "gower", stand=TRUE)
+mds.data <- cmdscale(dist_data,eig=TRUE, k=5)
+```
+
+
+```{r}
+eigv <- mds.data$eig
+cumsum(eigv[1:5])/sum(eigv[eigv>0])*100
+cumsum(eigv[1:5])/sum(abs(eigv))*100
+```
+
+We now plot our points on the most relevant coordinates, with labels so that we can explain the relationship between the points that are close to each other.
+```{r}
+x <- mds.data$points[,1]
+y <- mds.data$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+     main="Metric MDS", type="n")
+text(x, y, labels = data$segment, cex=.5)
+```
+It seems that our data is separated by segment: Premium at the top left, Gaming bottom left, and Core at the right.
+
+```{r}
+
+x <- mds.data$points[,1]
+y <- mds.data$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+     main="Metric MDS", type="n")
+text(x, y, labels = data$prod_category, cex=.5)
+```
+We can see that the coordinates also seem to separate by category. In general, at the top left corner we have Arale and Conan, bottom left we have Goku, Bobobo and Doraemon, and on the right side we have Luffy and Clover.
+
+```{r}
+x <- mds.data$points[,1]
+y <- mds.data$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+     main="Metric MDS", type="n")
+text(x, y, labels = data$display_size, cex=.5)
+```
+We do not see a strong separation by display_size, although it seems that the higher the value of Coordinate 2, the lower the display size.
+
+```{r}
+x <- mds.data$points[,1]
+y <- mds.data$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+     main="Metric MDS", type="n")
+text(x, y, labels = data$specs, cex=.5)
+```
+We don't see a clear relationship between specs and the coordinates.
+
+We store the MDS coordinates in a csv file so that we can apply a clustering algorithm later.
+```{r}
+new_data = cbind(data$product_number, mds.data$points)
+colnames(new_data) <- c("product_number", "Coordinate 1", "Coordinate 2", "Coordinate 3", "Coordinate 4", "Coordinate 5")
+write.csv(new_data, "Coordinates.csv", row.names=FALSE)
+```
+
