@@ -29,7 +29,7 @@ The plotting functions include some plotting of the preprocessed data, some plot
 
 ## Original Approach
 
-Our original approach is what we mentioned in the introduction, and its implementation can be found in original.py and original.ipynb. In this case, we have separate filters for each product_number. We use the adaptive filter to compute predictions, and select L and $\mu$ based on how well the filter can predict the observations that we have. However, we give more importance to the last predictions being the best. We chose this because we want our filter to adjust well with the final observations that we have available, because those are the ones that will be most correlated with the future observations that we want to predict. We also tried different metrics, but this proved to be the one that minimized the RMSE.
+Our original approach is what we mentioned in the introduction, and its implementation can be found in original.py and original.ipynb. In this case, we have separate filters for each product_number. We use the adaptive filter to compute predictions, and select L and $\mu$ based on how well the filter can predict the observations that we have. However, we give more importance to the last predictions being the best. We chose this because we want our filter to adjust well with the final observations that we have available, because those are the ones that will be most correlated with the future observations that we want to predict. We also tried different metrics, but this proved to be the one that gave us the best RMSE results.
 
 ## Modified Approach
 
